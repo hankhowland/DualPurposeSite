@@ -4,12 +4,58 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- custom style -->
 </head>
 
+<style>
+.increment {
+    background-color:green;
+    color:white;
+    font-weight:bold;
+    padding:1px 2px;
+    text-decoration:none;
+    border-radius:2px; 
+}
+.resetCounter {
+    background-color:red;
+    color:white;
+    font-weight:bold;
+    padding:1px 2px;
+    text-decoration:none;
+    border-radius:2px; 
+}
+a:hover {
+    color:black;
+    text-decoration:none;
+}
+
+</style>
 
 <div class="container">
+    <div class="row pt-2">
+        <div class="col-12">
+            <b>Days:</b> 
+        </div>
+        <div class="col-1"></div>
+        <div class="col-4">
+            without hitting the juul: <%= juul[0].count %>
+            <a class="increment" href="/routes/incrementJuul">&uarr;</a>
+            <a class="resetCounter" href="/routes/resetJuul">&#10005;</a>
+        </div>
+        <div class="col-3">
+            meditating: <%= med[0].count %>
+            <a class="increment" href="/routes/incrementMed">&uarr;</a>
+            <a class="resetCounter" href="/routes/resetMed">&#10005;</a>
+        </div>
+        <div class="col-4">
+            with screentime &lt;3 hours: <%= st[0].count %>
+            <a class="increment" href="/routes/incrementST">&uarr;</a>
+            <a class="resetCounter" href="/routes/resetST">&#10005;</a>
+        </div>
+    </div>
+    <hr style="border-top: 2px solid black;">
     <div class="row">
-        <div class="col-6 border-right"> 
+        <div class="col-6" style="border-right: 2px solid black;"> 
             <!-- left column -->
             <h5 class="mt-3">RUNNING TRAINING JOURNAL</h5>
             <hr>
