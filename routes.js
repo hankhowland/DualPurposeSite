@@ -20,6 +20,7 @@ router.get('/', async function(req, res, next){
         assert.equal(null, err);
         runsArray.push(doc);
     }); 
+
     await hoursCursor.forEach(function(doc, err) {
         assert.equal(null, err);
         hoursArray.push(doc);
@@ -36,10 +37,22 @@ router.get('/', async function(req, res, next){
         assert.equal(null, err);
         stArray.push(doc);
     }); 
+
+    // total miles
+    var total_miles = 0;
+    runsArray.forEach((run) => {
+        total_miles += parseFloat(run.distance);
+    });
+
+    //total hours
+    var total_hours = 0;
+    hoursArray.forEach((hour) => {
+        total_hours += parseFloat(hour.hours);
+    });
     
       
     
-    res.render('index', {items: runsArray, hours: hoursArray, juul: juulArray, med:medArray, st:stArray});
+    res.render('index', {items: runsArray, hours: hoursArray, juul: juulArray, med:medArray, st:stArray, totalMiles: total_miles, totalHours: total_hours});
 });
 
 //add run from form action
