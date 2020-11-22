@@ -77,8 +77,8 @@ a:hover {
                     <form action="/routes/addrun" method="post">
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>Date (m/d/yyyy)</label>
-                                <input class="form-control" name="runDate">
+                                <label for="run-date">Date (m/d/yyyy)</label>
+                                <input class="form-control" type="date" value=<%= today %> id="run-date" name="runDate">
                             </div>
                             <div class="form-group">
                                 <label>Title</label>
@@ -155,7 +155,7 @@ a:hover {
                         <div class="modal-body">
                             <div class="form-group">
                                 <label>Date (m/d/yyyy)</label>
-                                <input class="form-control" name="date">
+                                <input class="form-control" type="date" value=<%= today %> name="date">
                             </div>
                             <div class="form-group">
                                 <label>Hours of Practice</label>

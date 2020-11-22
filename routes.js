@@ -7,9 +7,9 @@ router.get('/', async function(req, res, next){
     //get runs
     const db = req.app.locals.db;
     var runsArray = [];
-    var runsCursor = db.collection('runs').find();
+    var runsCursor = db.collection('runs').find().sort({date: -1});
     var hoursArray = [];
-    var hoursCursor = db.collection('hours').find();
+    var hoursCursor = db.collection('hours').find().sort({date: -1});
     var juulCursor = db.collection('counts').find({type:"juul"});
     var juulArray = [];
     var medCursor = db.collection('counts').find({type:"meditation"});
@@ -18,11 +18,13 @@ router.get('/', async function(req, res, next){
     var stArray = [];
     await runsCursor.forEach(function(doc, err) {
         assert.equal(null, err);
+        doc.date = doc.date.toISOString().split('T')[0]
         runsArray.push(doc);
     }); 
 
     await hoursCursor.forEach(function(doc, err) {
         assert.equal(null, err);
+        doc.date = doc.date.toISOString().split('T')[0]
         hoursArray.push(doc);
     });
     await juulCursor.forEach(function(doc, err) {
@@ -49,20 +51,33 @@ router.get('/', async function(req, res, next){
     hoursArray.forEach((hour) => {
         total_hours += parseFloat(hour.hours);
     });
+    //today's date
+    let options = {
+        timeZone: 'America/Chicago',
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+      }
+    const today = new Date().toLocaleString([], options);
+    var todayString = today.split(',')[0]
+    var todayString = todayString.replace(/(\d\d)\/(\d\d)\/(\d{4})/, "$3-$1-$2");
     
       
     
-    res.render('index', {items: runsArray, hours: hoursArray, juul: juulArray, med:medArray, st:stArray, totalMiles: total_miles, totalHours: total_hours});
+    res.render('index', {items: runsArray, hours: hoursArray, juul: juulArray, med:medArray, st:stArray, totalMiles: total_miles, totalHours: total_hours,
+        today: todayString});
 });
 
 //add run from form action
 router.route('/addrun')
     .post(function(req, res, next) {
         const db = req.app.locals.db;
-        console.log(req.body);
         const item = {
             distance: req.body.runDistance,
-            date: req.body.runDate,
+            date: new Date(req.body.runDate),
             title: req.body.runTitle,
             notes: req.body.runNotes
         }
@@ -81,7 +96,7 @@ router.route('/addhours')
         const db = req.app.locals.db;
         console.log(req.body);
         const item = {
-            date: req.body.date,
+            date: new Date(req.body.date),
             hours: req.body.hours,
             notes: req.body.notes
         }
