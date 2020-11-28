@@ -8,13 +8,13 @@
 </head>
 
 
-<% console.log(runs) %>
 <div class="container pt-2">
     <h5 class="text-center">Training Plan</h5><hr>
 
-    <!-- display all runs -->
+    <!-- display this weeks runs -->
     <div class="row justify-content-center">
         <div class="col-6">
+            <p>THIS WEEK'S RUNS</p>
             <ul class="list-group">
                 <% runs.forEach(function(run) { %>
                     <li class="list-group-item">
@@ -25,6 +25,7 @@
         </div>
     </div>
     <hr>
+
 
     <button type="button" class="btn btn-primary text-center" data-toggle="modal" data-target="#addPlannedRunForm">
         Add Planned Run
@@ -58,6 +59,21 @@
                     </div>
                 </form>   
             </div>
+        </div>
+    </div>
+    <hr>
+
+    <!-- display all other planned runs-->
+    <div class="row justify-content-center">
+        <div class="col-6">
+            <p>FUTURE RUNS</p>
+            <ul class="list-group">
+                <% restRuns.forEach(function(run) { %>
+                    <li class="list-group-item">
+                        <%= run.date %>: <%= run.description %> 
+                    </li>
+                <% }); %>
+            </ul>
         </div>
     </div>
 

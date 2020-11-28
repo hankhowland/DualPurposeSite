@@ -73,8 +73,12 @@ router.get('/', async function(req, res, next){
 
 //training plan page
 router.get('/trainingPlan', async function(req, res, next) {
+    var prevMonday = getPreviousMonday();
+    new Date(prevMonday);
+    var sunday = new Date()
+    sunday.setDate(prevMonday.getDate() + 7)
     const db = req.app.locals.db;
-    var runsCursor = db.collection('plannedRuns').find().sort({date: -1});
+    var runsCursor = db.collection('plannedRuns').find({"date" : { $gte : prevMonday, $lte : sunday}}).sort({date: 1});
     const runsArray = []
     await runsCursor.forEach(function(doc, err) {
         assert.equal(null, err);
@@ -82,7 +86,15 @@ router.get('/trainingPlan', async function(req, res, next) {
         runsArray.push(doc);
     }); 
 
-    res.render('trainingPlan', {runs: runsArray});
+    var restRunsCursor = db.collection('plannedRuns').find({"date" : { $gt : sunday}}).sort({date: 1});
+    const restRunsArray = []
+    await restRunsCursor.forEach(function(doc, err) {
+        assert.equal(null, err);
+        doc.date = doc.date.toISOString().split('T')[0]
+        restRunsArray.push(doc);
+    }); 
+
+    res.render('trainingPlan', {runs: runsArray, restRuns: restRunsArray});
 
 });
 
@@ -201,3 +213,21 @@ router.get('/resetST', async function(req, res, next) {
 
 
 module.exports = router;
+
+
+
+/////utility functions
+function getPreviousMonday()
+{
+    var date = new Date();
+    var day = date.getDay();
+    var prevMonday = new Date();
+    if(date.getDay() == 0){
+        prevMonday.setDate(date.getDate());
+    }
+    else{
+        prevMonday.setDate(date.getDate() - (day-1));
+    }
+
+    return prevMonday;
+}
