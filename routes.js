@@ -71,6 +71,21 @@ router.get('/', async function(req, res, next){
         today: todayString});
 });
 
+//training plan page
+router.get('/trainingPlan', async function(req, res, next) {
+    const db = req.app.locals.db;
+    var runsCursor = db.collection('plannedRuns').find().sort({date: -1});
+    const runsArray = []
+    await runsCursor.forEach(function(doc, err) {
+        assert.equal(null, err);
+        doc.date = doc.date.toISOString().split('T')[0]
+        runsArray.push(doc);
+    }); 
+
+    res.render('trainingPlan', {runs: runsArray});
+
+});
+
 //add run from form action
 router.route('/addrun')
     .post(function(req, res, next) {
@@ -90,6 +105,7 @@ router.route('/addrun')
         res.redirect('/routes/');
 });
 
+
 //add programming hours from form 
 router.route('/addhours')
     .post(function(req, res, next) {
@@ -107,6 +123,23 @@ router.route('/addhours')
         });
 
         res.redirect('/routes/');
+});
+
+//add run to training plan 
+router.route('/addPlannedRun')
+    .post(function(req, res, next) {
+        const db = req.app.locals.db;
+        const item = {
+            date: new Date(req.body.Date),
+            description: req.body.Desc
+        }
+
+        db.collection('plannedRuns').insertOne(item, function(err, result) {
+            assert.equal(null, err);
+            console.log('item inserted');
+        });
+
+        res.redirect('/routes/trainingPlan');
 });
 
 
