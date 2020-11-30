@@ -75,8 +75,11 @@ router.get('/', async function(req, res, next){
 router.get('/trainingPlan', async function(req, res, next) {
     var prevMonday = getPreviousMonday();
     new Date(prevMonday);
+    prevMonday.setDate(prevMonday.getDate() - 1)
     var sunday = new Date()
     sunday.setDate(prevMonday.getDate() + 7)
+    
+    console.log(prevMonday)
     const db = req.app.locals.db;
     var runsCursor = db.collection('plannedRuns').find({"date" : { $gte : prevMonday, $lte : sunday}}).sort({date: 1});
     const runsArray = []
