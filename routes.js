@@ -65,8 +65,6 @@ router.get('/', async function(req, res, next){
         prevMonday.setHours(-8,0,0,0);
         totalsArray.forEach((run) => {
             if ((run.date >= prevMonday) && (run.date <= nextMonday) ) {
-                console.log(run.date);
-                console.log(run.distance);
                 currTotal += Number(run.distance);
             }
         })
