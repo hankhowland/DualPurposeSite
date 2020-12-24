@@ -1,0 +1,53 @@
+<head>
+    <!---bootstrap-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- custom style -->
+</head>
+
+
+<div class="container pt-4 pb-4">
+
+    <!-- display this weeks runs -->
+    <div class="row justify-content-center">
+        <div class="col-6">
+            <h5><b>HISTORICAL TRAINING LOG</b></h5>
+            <ul class="list-group">
+                <% items.forEach(function(item) { %>
+                    <% var dateDay = new Date(item.date);%>
+                    <% if (dateDay.getDay() == 6) { %>
+                        <li class="list-group-item"><b>WEEK ENDING <%= item.date %></b></li>
+                    <% } %>
+                    <li class="list-group-item">
+                        <%= item.date %>: <%= item.title %> -- <%= item.distance %> miles 
+                        <% if (item.notes != '') { %>
+                            <!-- notes modal -->
+                            <button class="btn btn-sm btn-info float-right" data-toggle="modal" data-target="#notesModal-<%= item._id %>">Notes</span>
+                            <div class="modal fade" id="notesModal-<%= item._id %>" tabindex="-1" role="dialog" aria-labelledby="label" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header" style="color:black;">
+                                            <span>Notes for <%= item.date %></span>
+                                        </div>
+                                        <div class="modal-body">
+                                            <span style="color:black;"><%= item.notes %></span>
+                                        </div>  
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+    </div>
+    <hr>
+    <a role="button" href="/routes/" class="btn btn-primary float-right">
+        Back to Main Page
+    </a>
+    
+
+
+</div>

@@ -4,7 +4,8 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <!-- custom style -->
+    <!--- chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 </head>
 
 <style>
@@ -32,25 +33,27 @@ a:hover {
 </style>
 
 <div class="container">
-    <div class="row pt-2">
+    <div id="streaksContainer" style="visibility:hidden;" class="row pt-2">
         <div class="col-12">
             <b>Days:</b> 
         </div>
-        <div class="col-1"></div>
-        <div class="col-4">
+        <div class="col-3">
             without hitting the juul: <%= juul[0].count %>
             <a class="increment" href="/routes/incrementJuul">&uarr;</a>
             <a class="resetCounter" href="/routes/resetJuul">&#10005;</a>
         </div>
         <div class="col-3">
-            meditating: <%= med[0].count %>
+            without drinking: <%= med[0].count %>
             <a class="increment" href="/routes/incrementMed">&uarr;</a>
             <a class="resetCounter" href="/routes/resetMed">&#10005;</a>
         </div>
-        <div class="col-4">
-            w/o yt, sc, or ig: <%= st[0].count %>
+        <div class="col-3">
+            without smoking: <%= st[0].count %>
             <a class="increment" href="/routes/incrementST">&uarr;</a>
             <a class="resetCounter" href="/routes/resetST">&#10005;</a>
+        </div>
+        <div style="visibility:visible;" class="col-3">
+            <button id="StreaksButton" class="btn btn-primary" onClick="toggleStreaks()">Show Streaks</button>
         </div>
     </div>
     <hr style="border-top: 2px solid black;">
@@ -59,7 +62,7 @@ a:hover {
             <!-- left column -->
             <h5 class="mt-3">RUNNING TRAINING JOURNAL</h5>
             <hr>
-            <p>Goal: run every day</p>
+            <p>Goal: Break 4</p>
             <!-- add run modal -->
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addRunForm">
                 Add Run
@@ -105,12 +108,13 @@ a:hover {
                 </div>
             </div>
             <hr>
-
+            <h5>This Week's Runs</h5>
             <!-- display all runs -->
+            <% days = ['M','T', 'W', 'Th', 'F', 'Sa', 'Su']; %>
             <ul class="list-group">
                 <% items.forEach(function(item) { %>
                     <li class="list-group-item">
-                        <%= item.date %>: <%= item.title %> -- <%= item.distance %> miles 
+                        <%= days[new Date(item.date).getDay()] %>: <%= item.title %> -- <%= item.distance %> miles 
                         <% if (item.notes != '') { %>
                             <!-- notes modal -->
                             <button class="btn btn-sm btn-info float-right" data-toggle="modal" data-target="#notesModal-<%= item._id %>">Notes</span>
@@ -130,85 +134,88 @@ a:hover {
                     </li>
                 <% }); %>
             </ul>
-            <hr>
-            Total Miles: <%= totalMiles %>
+            <div class="mt-3">Weekly Miles: <%= totalMiles %>
+                <div class="float-right"><a role="button" href="/routes/archive" class="btn btn-primary">See All Runs</a></div>
+            </div>
         </div>
 
 
         <div class="col-6">
             <!-- right column -->
-            <h5 class="mt-3">PROGRAMMING PRACTICE TRACKER</h5>
+            <h5 class="mt-3">MILEAGE TRACKER</h5>
             <hr>
-            <p>Goal: 3 hours a day, 20 hours a week</p>
-            <!-- add day modal -->
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addHoursForm">
-                Add Hours
-            </button>
-            <div class="modal fade" id="addHoursForm" tabindex="-1" role="dialog" aria-labelledby="label" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                    <h5 class="modal-title" id="label">Add Hours</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    </div>
-                    
-                    <form action="/routes/addhours" method="post">
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label>Date (m/d/yyyy)</label>
-                                <input class="form-control" type="date" value=<%= today %> name="date">
-                            </div>
-                            <div class="form-group">
-                                <label>Hours of Practice</label>
-                                <input name="hours" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label>Notes</label>
-                                <textarea class="form-control" name="notes"></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" id="addrunsubmit" class="btn btn-lg btn-primary">Add</button>
-                        </div>
-                    </form>  
-                </div>
-                </div>
+            <div>
+                <canvas id="chartCanvas"></canvas>
             </div>
-            <hr>
-            
-            <!-- display all hours -->
-            <ul class="list-group">
-                <% hours.forEach(function(hour) { %>
-                    <li class="list-group-item">
-                        <%= hour.date %>: <%= hour.hours %> hours
-                        <% if (hour.notes != '') { %>
-                            <!-- notes modal -->
-                            <button class="btn btn-sm btn-info float-right" data-toggle="modal" data-target="#notesModal-<%= hour._id %>">Notes</span>
-                            <div class="modal fade" id="notesModal-<%= hour._id %>" tabindex="-1" role="dialog" aria-labelledby="label" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header" style="color:black;">
-                                            <span>Notes for <%= hour.date %></span>
-                                        </div>
-                                        <div class="modal-body">
-                                            <span style="color:black;"><%= hour.notes %></span>
-                                        </div>  
-                                    </div>
-                                </div>
-                            </div>
-                        <% } %>
-                    </li>
-                <% }); %>
-            </ul>
-            <hr>
-            Total Hours: <%= totalHours %>
-
         </div>
     </div>
 </div>
 
+
+
+
+
+
+
+<script>
+
+    //show and hide streaks
+    function toggleStreaks() {
+        var streaksContainer = document.querySelector("#streaksContainer");
+        var button = document.querySelector("#streaksButton");
+        if (streaksContainer.style.visibility == 'hidden') {
+            streaksContainer.style.visibility = 'visible';
+            button.innerHTML = 'Hide Streaks';
+        }
+        else {
+            streaksContainer.style.visibility = 'hidden';
+            button.innerHTML = 'Show Streaks';
+        }
+    }
+
+
+    //weekly mileage chart
+    var ctx = document.getElementById('chartCanvas').getContext('2d');
+    var mileageX = '<%- JSON.stringify(mileageX) %>';
+    var weeklyMileage = '<%- JSON.stringify(weeklyMileage) %>';
+    mileageX = JSON.parse(mileageX);
+    weeklyMileage = JSON.parse(weeklyMileage);
+    console.log(mileageX);
+    console.log(weeklyMileage);
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: mileageX,
+            datasets: [
+                {
+                label: "Miles",
+                data: weeklyMileage,
+                backgroundColor: '#90ee90'
+                }
+            ]
+        },
+        options: {
+            legend: { display: false },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        maxTicksLimit: 6
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Miles'
+                    }
+                }],
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Weeks Ago'
+                    }
+                }]
+            }
+        }
+    });
+</script>
 
 
 
