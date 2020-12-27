@@ -8,9 +8,8 @@ router.get('/', async function(req, res, next){
     var prevMonday = getPreviousMonday();
     new Date(prevMonday);
     var nextMonday = new Date();
-    nextMonday.setDate(prevMonday.getDate() + 7);
+    nextMonday.setDate(prevMonday.getDate() + 8);
     nextMonday.setHours(-8,0,0,0);
-
     //get runs
     const db = req.app.locals.db;
     var runsArray = [];
@@ -63,8 +62,10 @@ router.get('/', async function(req, res, next){
         prevMonday.setDate(prevMonday.getDate() -6);
         nextMonday.setHours(-8,0,0,0);
         prevMonday.setHours(-8,0,0,0);
+        console.log(prevMonday);
+        console.log(nextMonday);
         totalsArray.forEach((run) => {
-            if ((run.date >= prevMonday) && (run.date <= nextMonday) ) {
+            if ((run.date >= prevMonday) && (run.date < nextMonday) ) {
                 currTotal += Number(run.distance);
             }
         })
@@ -240,13 +241,15 @@ function getPreviousMonday()
     var date = new Date();
     var day = date.getDay();
     var prevMonday = new Date();
-    if(date.getDay() == 0){
+    if(date.getDay() == 1){ //monday
         prevMonday.setDate(date.getDate());
     }
-    else{
+    else if (date.getDay() == 0) { //sunday
+        prevMonday.setDate(date.getDate() - 6);
+    }
+    else{ //tues-sat (2-6)
         prevMonday.setDate(date.getDate() - (day-1));
     }
     prevMonday.setHours(-8, 0, 0,0);
-
     return prevMonday;
 }
